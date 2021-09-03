@@ -7,7 +7,7 @@ import numpy as np
 
 latex.extra_preamble('')
 latex.add_macro(r'\def\bs#1{{\boldsymbol #1}}')
-latex.matrix_delimiters([, ])
+latex.matrix_delimiters('[', ']')
 
 
 def LMatrix(mat, name=None, hidden=False, wrapper='', **kwargs):
@@ -25,8 +25,8 @@ def LMatrix(mat, name=None, hidden=False, wrapper='', **kwargs):
             else:
                 e_str = str(e)
             s += r' {} &'.format(e_str)
-        s = s[:-2] + r' \'
-    s = s[:-2] + r'\end{bmatrix} ' + wrapper
+        s = s[:-2] + r' \\'
+    s = s[:-2] + r'\\end{bmatrix} ' + wrapper
     if name is not None:
         globals()[name] = Matrix(mat)
     return s
@@ -47,7 +47,7 @@ def LList(l, name=None, hidden=False, wrapper='$', **kwargs):
     if name is not None and not hidden:
         s += f'{name} = '
     l_str = str(l)
-    s += f'\left{l_str[0]}'
+    s += f'\\left{l_str[0]}'
     for e in l:
         if parent(e) is RR:
             e_str = e.str(**kwargs)
@@ -72,7 +72,7 @@ def LScalarMul(mat, scalar, name=None):
     for r in mat:
         for e in r:
             s += r' {} \cdot {} &'.format(scalar, e)
-        s = s[:-2] + r' \'
+        s = s[:-2] + r' \\'
     s = s[:-2] + r'\end{bmatrix} = ' + LMatrix(product).data 
     if name is not None:
         globals()[name] = product
@@ -109,7 +109,7 @@ def LCofactorDeterminant(mat, row=None, column=None, rhs_only=False):
     assert mat.is_square(), 'Matrix must be a square matrix for the determinant to be defined'
     
     if not rhs_only:
-        s = r' \left| {} \right|  = '.format(LMatrix(mat))
+        s = r' \\left| {} \right|  = '.format(LMatrix(mat))
     else:
         s = ''
         
@@ -123,12 +123,12 @@ def LCofactorDeterminant(mat, row=None, column=None, rhs_only=False):
     rows = range(mat.nrows()) if row is None else [row]*mat.nrows()
     columns = range(mat.ncols()) if column is None else [column]*mat.ncols()
     
-    s += ' '.join([r'{} \cdot \left| {} \right| + '
+    s += ' '.join([r'{} \cdot \\left| {} \right| + '
                    .format(mat[i, j], LMatrix(submatrix(mat, i, j)))
                    for i, j in zip(rows, columns) if mat[i, j] != 0])
     if mat.nrows() == 3:
         s = s[:-2] + '= '
-        s += ' '.join([r'{} \cdot \left( {} \right) + '
+        s += ' '.join([r'{} \cdot \\left( {} \right) + '
                        .format(mat[i, j], LCofactorDeterminant(submatrix(mat, i, j), 
                                                                rhs_only=True))
                        for i, j in zip(rows, columns) if mat[i,j] != 0])
@@ -174,7 +174,7 @@ def show_var(*names, approx=True, debug=False):
             try:
                 approx = n(value, digits=3)
                 if value != approx:
-                    expr += LatexExpr(f'\sim') + latex(approx)
+                    expr += LatexExpr(f'\\sim') + latex(approx)
                 elif parent(value) is QQ and not _can_convert_to_ZZ(value):
                     expr += LatexExpr(f'= {RR(approx).str(truncate=True, skip_zeroes=True)}')
                 elif value.base_ring() is QQ and not _can_convert_to_ZZ(value):

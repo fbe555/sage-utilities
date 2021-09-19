@@ -169,7 +169,12 @@ def show_var(*names, approx=True, debug=False):
         names = [name.strip() for name in source.split('=')[0].split(',')]
     for name in names:
         value = globals()[name]
-        expr = LatexExpr(f'\\text{{{name}}} = ') + latex(value)
+        expr = LatexExpr(f'\\text{{{name}}}')
+        if isinstance(value, sage.symbolic.expression.Expression) and value.is_relational():
+            expr += ' \\text{: } '
+        else:
+            expr += ' = '
+        expr += latex(value)
         if approx:
             try:
                 approx = n(value, digits=3)
